@@ -291,8 +291,6 @@ FN should at least take in STR and QUERY."
                  ,'flx-score)
           (const :tag "Score using Flx-RS"
                  ,'flx-rs-score)
-          (const :tag "Score using Hotfuzz"
-                 ,#'fussy-hotfuzz-score)
           (function :tag "Custom function"))
   :group 'fussy)
 
@@ -1103,17 +1101,6 @@ result: LIST ^a"
   (if (functionp company-backend)
       candidates
     (fussy--sort candidates)))
-
-;; `hotfuzz' integration
-(declare-function "hotfuzz--cost" "hotfuzz")
-
-(defun fussy-hotfuzz-score (str query &rest _args)
-  "Score STR for QUERY using `hotfuzz'."
-  (require 'hotfuzz)
-  (when (fboundp 'hotfuzz--cost)
-    ;; Looks like the score is flipped for `hotfuzz'.
-    ;; See `hotfuzz-all-completions'.
-    (list (- (hotfuzz--cost query str)))))
 
 (provide 'fussy)
 ;;; fussy.el ends here
