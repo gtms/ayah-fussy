@@ -1104,22 +1104,6 @@ result: LIST ^a"
       candidates
     (fussy--sort candidates)))
 
-;; `fzf-native' integration
-(defvar fussy--fzf-native-slab nil)
-(defsubst fussy--fzf-native-slab ()
-  "Return lazy loaded slab for `fzf-native'."
-  (or fussy--fzf-native-slab
-      (when (fboundp 'fzf-native-make-default-slab)
-        (setf fussy--fzf-native-slab (fzf-native-make-default-slab)))))
-
-(defun fussy-fzf-native-score (str query &rest _args)
-  "Score STR for QUERY using `fzf-native'."
-  (require 'fzf-native)
-  (when (fboundp 'fzf-native-score)
-    (let ((str (funcall fussy-remove-bad-char-fn str))
-          (query (fussy-encode-coding-string query)))
-      (fzf-native-score str query (fussy--fzf-native-slab)))))
-
 ;; `hotfuzz' integration
 (declare-function "hotfuzz--cost" "hotfuzz")
 
