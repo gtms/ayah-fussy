@@ -291,8 +291,6 @@ FN should at least take in STR and QUERY."
                  ,'flx-score)
           (const :tag "Score using Flx-RS"
                  ,'flx-rs-score)
-          (const :tag "Score using LiquidMetal"
-                 ,#'fussy-liquidmetal-score)
           (const :tag "Score using Sublime-Fuzzy"
                  ,#'fussy-sublime-fuzzy-score)
           (const :tag "Score using Hotfuzz"
@@ -1107,18 +1105,6 @@ result: LIST ^a"
   (if (functionp company-backend)
       candidates
     (fussy--sort candidates)))
-
-;; `liquidmetal' integration
-(declare-function "liquidmetal-score" "liquidmetal")
-
-(defun fussy-liquidmetal-score (str query &rest _args)
-  "Score STR for QUERY using `liquidmetal'.
-
-This should be paired with `fussy-filter-orderless' to obtain match
-highlighting."
-  (require 'liquidmetal)
-  (when (fboundp 'liquidmetal-score)
-    (list (liquidmetal-score str query))))
 
 ;; `sublime-fuzzy' integration
 (declare-function "sublime-fuzzy-score" "sublime-fuzzy")
