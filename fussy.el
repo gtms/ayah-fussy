@@ -291,8 +291,6 @@ FN should at least take in STR and QUERY."
                  ,'flx-score)
           (const :tag "Score using Flx-RS"
                  ,'flx-rs-score)
-          (const :tag "Score using Sublime-Fuzzy"
-                 ,#'fussy-sublime-fuzzy-score)
           (const :tag "Score using Hotfuzz"
                  ,#'fussy-hotfuzz-score)
           (function :tag "Custom function"))
@@ -1105,20 +1103,6 @@ result: LIST ^a"
   (if (functionp company-backend)
       candidates
     (fussy--sort candidates)))
-
-;; `sublime-fuzzy' integration
-(declare-function "sublime-fuzzy-score" "sublime-fuzzy")
-
-(defun fussy-sublime-fuzzy-score (str query &rest _args)
-  "Score STR for QUERY using `sublime-fuzzy'."
-  (require 'sublime-fuzzy)
-  (when (fboundp 'sublime-fuzzy-score)
-    (let ((str
-           (funcall fussy-remove-bad-char-fn str))
-          (query
-           ;; Assume query can just be passed in as a unibyte string.
-           (fussy-encode-coding-string query)))
-      (list (sublime-fuzzy-score query str)))))
 
 ;; `fzf-native' integration
 (defvar fussy--fzf-native-slab nil)
