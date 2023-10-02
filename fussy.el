@@ -291,10 +291,6 @@ FN should at least take in STR and QUERY."
                  ,'flx-score)
           (const :tag "Score using Flx-RS"
                  ,'flx-rs-score)
-          (const :tag "Score using Fuz"
-                 ,#'fussy-fuz-score)
-          (const :tag "Score using Fuz-Bin"
-                 ,#'fussy-fuz-bin-score)
           (const :tag "Score using LiquidMetal"
                  ,#'fussy-liquidmetal-score)
           (const :tag "Score using Sublime-Fuzzy"
@@ -1111,68 +1107,6 @@ result: LIST ^a"
   (if (functionp company-backend)
       candidates
     (fussy--sort candidates)))
-
-;; `fuz' integration.
-(declare-function "fuz-fuzzy-match-skim" "fuz")
-(declare-function "fuz-calc-score-skim" "fuz")
-(declare-function "fuz-fuzzy-match-clangd" "fuz")
-(declare-function "fuz-calc-score-clangd" "fuz")
-
-(defun fussy-fuz-score (str query &rest _args)
-  "Score STR for QUERY using `fuz'.
-
-skim or clangd algorithm can be used.
-
-If `orderless' is used for filtering, we skip calculating matches
-for more speed."
-  (require 'fuz)
-  (let ((str (funcall fussy-remove-bad-char-fn str))
-        (query
-         ;; Assume query can just be passed in as a unibyte string.
-         (fussy-encode-coding-string query)))
-    (if fussy-fuz-use-skim-p
-        (if (fussy--orderless-p)
-            (when (fboundp 'fuz-calc-score-skim)
-              (list (fuz-calc-score-skim query str)))
-          (when (fboundp 'fuz-fuzzy-match-skim)
-            (fuz-fuzzy-match-skim query str)))
-      (if (fussy--orderless-p)
-          (when (fboundp 'fuz-calc-score-clangd)
-            (list (fuz-calc-score-clangd query str)))
-        (when (fboundp 'fuz-fuzzy-match-clangd)
-          (fuz-fuzzy-match-clangd query str))))))
-
-;; `fuz-bin' integration.
-(declare-function "fuz-bin-dyn-score-skim" "fuz-bin")
-(declare-function "fuz-bin-score-skim" "fuz-bin")
-(declare-function "fuz-bin-dyn-score-clangd" "fuz-bin")
-(declare-function "fuz-bin-score-clangd" "fuz-bin")
-
-(defun fussy-fuz-bin-score (str query &rest _args)
-  "Score STR for QUERY using `fuz-bin'.
-
-skim or clangd algorithm can be used.
-
-If `orderless' is used for filtering, we skip calculating matches
-for more speed."
-  (require 'fuz-bin)
-  ;; (message (format "before: str: %s query: %s" str query))
-  (let ((str (funcall fussy-remove-bad-char-fn str))
-        (query
-         ;; Assume query can just be passed in as a unibyte string.
-         (fussy-encode-coding-string query)))
-    ;; (message (format "after: str: %s query: %s" str query))
-    (if fussy-fuz-use-skim-p
-        (if (fussy--orderless-p)
-            (when (fboundp 'fuz-bin-dyn-score-skim)
-              (list (fuz-bin-dyn-score-skim query str)))
-          (when (fboundp 'fuz-bin-score-skim)
-            (fuz-bin-score-skim query str)))
-      (if (fussy--orderless-p)
-          (when (fboundp 'fuz-bin-dyn-score-clangd)
-            (list (fuz-bin-dyn-score-clangd query str)))
-        (when (fboundp 'fuz-bin-score-clangd)
-          (fuz-bin-score-clangd query str))))))
 
 ;; `liquidmetal' integration
 (declare-function "liquidmetal-score" "liquidmetal")
